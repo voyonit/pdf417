@@ -1,0 +1,21 @@
+workflow:
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+    - if: '$CI_COMMIT_BRANCH =~ /^(main|staging)$/ && $CI_PIPELINE_SOURCE =~ /^(push|web|api)$/'
+
+voyon-project-standard:
+  stage: test
+  inherit:
+    default: false
+  image: ruby:3.4-bookworm
+  tags: [isolated, linux-amd64]
+  interruptible: true
+  timeout: 10 minutes
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+    - if: '$CI_COMMIT_BRANCH =~ /^(main|staging)$/ && $CI_PIPELINE_SOURCE =~ /^(push|web|api)$/'
+  script:
+    - test -s Makefile
+    - test -s ops/README.md
+    - make -n check
+    - "make check"
